@@ -4,14 +4,18 @@ import (
 	"context"
 
 	"github.com/go-playground/validator/v10"
+	"github.com/safatanc/mesa-chat-grpc/helper"
+	"github.com/safatanc/mesa-chat-grpc/model"
 	chat_pb "github.com/safatanc/mesa-chat-grpc/pb/chat/proto"
+	user_pb "github.com/safatanc/mesa-chat-grpc/pb/user/proto"
 	"gorm.io/gorm"
 )
 
 type ChatService struct {
 	chat_pb.UnimplementedChatServiceServer
-	DB       *gorm.DB
-	Validate *validator.Validate
+	DB          *gorm.DB
+	Validate    *validator.Validate
+	UserService user_pb.UserServiceClient
 }
 
 // Space
@@ -28,11 +32,27 @@ func (c *ChatService) DeleteSpace(ctx context.Context, request *chat_pb.DeleteSp
 }
 
 func (c *ChatService) FindAllSpace(ctx context.Context, request *chat_pb.FindAllSpaceRequest) (*chat_pb.Spaces, error) {
-	return nil, nil
+	var spaces []*model.Space
+	c.DB.Find(&spaces)
+
+	var spaceResponses []*chat_pb.Space
+	for _, space := range spaces {
+		spaceResponses = append(spaceResponses, helper.SpaceToSpaceResponse(space))
+	}
+
+	return &chat_pb.Spaces{
+		Spaces: spaceResponses,
+	}, nil
 }
 
 func (c *ChatService) FindSpace(ctx context.Context, request *chat_pb.FindSpaceRequest) (*chat_pb.Space, error) {
-	return nil, nil
+	var space *model.Space
+	result := c.DB.First(&space, "id = ?", request.Id)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	return helper.SpaceToSpaceResponse(space), nil
 }
 
 // Message
