@@ -1,0 +1,61 @@
+syntax = "proto3";
+
+package user_pb;
+option go_package = "github.com/safatanc/mesa-user-grpc";
+
+service UserService {
+  rpc CreateUser(CreateUserRequest) returns (UserResponse) {}
+  rpc UpdateUser(UpdateUserRequest) returns (UserResponse) {}
+  rpc DeleteUser(DeleteUserRequest) returns (UserResponse) {}
+  rpc FindAllUser(FindAllUserRequest) returns (UserResponses) {}
+  rpc FindUser(FindUserRequest) returns (UserResponse) {}
+}
+
+message CreateUserRequest {
+  string username = 1;
+  string full_name = 2;
+  string email = 3;
+  string phone = 4;
+  string password =5;
+}
+
+message UpdateUserRequest {
+  string username = 1;
+  UpdateUserRequestData data = 2;
+}
+
+message DeleteUserRequest {
+  string username = 1;
+}
+
+message UpdateUserRequestData {
+  optional string username = 1;
+  optional string full_name = 2;
+  optional string email = 3;
+  optional string phone = 4;
+  optional string password =5;
+}
+
+message Error {
+  string message = 1;
+}
+
+message UserResponse {
+  string id = 1;
+  string username = 2;
+  string full_name = 3;
+  string email = 4;
+  string phone = 5;
+  int64 created_at = 6;
+  int64 updated_at = 7;
+}
+
+message UserResponses {
+  repeated UserResponse users = 1;
+}
+
+message FindAllUserRequest {}
+
+message FindUserRequest {
+  string username = 1;
+}

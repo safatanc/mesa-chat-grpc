@@ -1,0 +1,77 @@
+syntax = "proto3";
+
+package chat_pb;
+option go_package = "github.com/safatanc/mesa-chat-grpc";
+
+service ChatService {
+  rpc CreateSpace(CreateSpaceRequest) returns (Space) {}
+  rpc UpdateSpace(UpdateSpaceRequest) returns (Space) {}
+  rpc DeleteSpace(DeleteSpaceRequest) returns (Space) {}
+  rpc FindAllSpace(FindAllSpaceRequest) returns (Spaces) {}
+  rpc FindSpace(FindSpaceRequest) returns (Space) {}
+
+  rpc SendMessage(SendMessageRequest) returns (Message) {}
+  rpc EditMessage(EditMessageRequest) returns (Message) {}
+  rpc DeleteMessage(DeleteMessageRequest) returns (Message) {}
+}
+
+// Space
+message Space {
+  string id = 1;
+  string title = 2;
+  string description = 3;
+  int64 created_at = 4;
+  int64 updated_at = 5;
+}
+
+message Spaces {
+  repeated Space spaces = 1;
+}
+
+message CreateSpaceRequest {
+  string title = 1;
+  string description = 2;
+}
+
+message UpdateSpaceRequest {
+  string title = 1;
+  string description = 2;
+}
+
+message DeleteSpaceRequest {
+  string id = 1;
+}
+
+message FindAllSpaceRequest {}
+
+message FindSpaceRequest {
+  string id = 1;
+}
+
+
+// Message
+message Message {
+  string id = 1;
+  string space_id = 2;
+  string author_id = 3;
+  Space space = 4;
+  string content = 5;
+  int64 created_at = 6;
+  int64 updated_at = 7;
+}
+
+message SendMessageRequest {
+  string space_id = 1;
+  string author_id = 2;
+  string content = 3;
+}
+
+message EditMessageRequest {
+  string space_id = 1;
+  string author_id = 2;
+  string content = 3;
+}
+
+message DeleteMessageRequest {
+  string id = 1;
+}
