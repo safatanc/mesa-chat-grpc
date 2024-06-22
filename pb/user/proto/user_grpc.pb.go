@@ -4,7 +4,7 @@
 // - protoc             v4.25.3
 // source: proto/user.proto
 
-package mesa_user_grpc
+package proto
 
 import (
 	context "context"

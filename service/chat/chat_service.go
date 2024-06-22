@@ -2,6 +2,7 @@ package chat
 
 import (
 	"context"
+	"errors"
 
 	"github.com/go-playground/validator/v10"
 	"github.com/safatanc/mesa-chat-grpc/helper"
@@ -20,7 +21,23 @@ type ChatService struct {
 
 // Space
 func (c *ChatService) CreateSpace(ctx context.Context, request *chat_pb.CreateSpaceRequest) (*chat_pb.Space, error) {
-	return nil, nil
+	author, err := c.UserService.FindUser(ctx, &user_pb.FindUserRequest{
+		Input: &user_pb.FindUserRequest_Id{
+			Id: request.AuthorId,
+		},
+	})
+	if err != nil {
+		return nil, errors.New("author not found")
+	}
+
+	space := helper.CreateSpaceRequestToSpace(request)
+	space.Author = author
+	result := c.DB.Create(&space)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	return helper.SpaceToSpaceResponse(space), nil
 }
 
 func (c *ChatService) UpdateSpace(ctx context.Context, request *chat_pb.UpdateSpaceRequest) (*chat_pb.Space, error) {
@@ -33,7 +50,7 @@ func (c *ChatService) DeleteSpace(ctx context.Context, request *chat_pb.DeleteSp
 
 func (c *ChatService) FindAllSpace(ctx context.Context, request *chat_pb.FindAllSpaceRequest) (*chat_pb.Spaces, error) {
 	var spaces []*model.Space
-	c.DB.Find(&spaces)
+	c.DB.Joins("Author").Find(&spaces)
 
 	var spaceResponses []*chat_pb.Space
 	for _, space := range spaces {
@@ -47,7 +64,7 @@ func (c *ChatService) FindAllSpace(ctx context.Context, request *chat_pb.FindAll
 
 func (c *ChatService) FindSpace(ctx context.Context, request *chat_pb.FindSpaceRequest) (*chat_pb.Space, error) {
 	var space *model.Space
-	result := c.DB.First(&space, "id = ?", request.Id)
+	result := c.DB.Joins("Author").First(&space, "spaces.id = ?", request.Id)
 	if result.Error != nil {
 		return nil, result.Error
 	}

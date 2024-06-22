@@ -1,7 +1,7 @@
 syntax = "proto3";
 
 package user_pb;
-option go_package = "github.com/safatanc/mesa-user-grpc";
+option go_package = "github.com/safatanc/mesa-chat-grpc/pb/user/proto";
 
 service UserService {
   rpc CreateUser(CreateUserRequest) returns (UserResponse) {}
@@ -57,5 +57,8 @@ message UserResponses {
 message FindAllUserRequest {}
 
 message FindUserRequest {
-  string username = 1;
+  oneof input {
+    string id = 1;
+    string username = 2;
+  }
 }

@@ -4,7 +4,7 @@
 // - protoc             v4.25.3
 // source: proto/chat.proto
 
-package mesa_chat_grpc
+package proto
 
 import (
 	context "context"
