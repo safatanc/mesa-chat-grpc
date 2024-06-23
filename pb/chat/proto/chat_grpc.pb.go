@@ -19,14 +19,16 @@ import (
 const _ = grpc.SupportPackageIsVersion8
 
 const (
-	ChatService_CreateSpace_FullMethodName   = "/chat_pb.ChatService/CreateSpace"
-	ChatService_UpdateSpace_FullMethodName   = "/chat_pb.ChatService/UpdateSpace"
-	ChatService_DeleteSpace_FullMethodName   = "/chat_pb.ChatService/DeleteSpace"
-	ChatService_FindAllSpace_FullMethodName  = "/chat_pb.ChatService/FindAllSpace"
-	ChatService_FindSpace_FullMethodName     = "/chat_pb.ChatService/FindSpace"
-	ChatService_SendMessage_FullMethodName   = "/chat_pb.ChatService/SendMessage"
-	ChatService_EditMessage_FullMethodName   = "/chat_pb.ChatService/EditMessage"
-	ChatService_DeleteMessage_FullMethodName = "/chat_pb.ChatService/DeleteMessage"
+	ChatService_CreateSpace_FullMethodName    = "/chat_pb.ChatService/CreateSpace"
+	ChatService_UpdateSpace_FullMethodName    = "/chat_pb.ChatService/UpdateSpace"
+	ChatService_DeleteSpace_FullMethodName    = "/chat_pb.ChatService/DeleteSpace"
+	ChatService_FindAllSpace_FullMethodName   = "/chat_pb.ChatService/FindAllSpace"
+	ChatService_FindSpace_FullMethodName      = "/chat_pb.ChatService/FindSpace"
+	ChatService_SendMessage_FullMethodName    = "/chat_pb.ChatService/SendMessage"
+	ChatService_EditMessage_FullMethodName    = "/chat_pb.ChatService/EditMessage"
+	ChatService_DeleteMessage_FullMethodName  = "/chat_pb.ChatService/DeleteMessage"
+	ChatService_FindAllMessage_FullMethodName = "/chat_pb.ChatService/FindAllMessage"
+	ChatService_FindMessage_FullMethodName    = "/chat_pb.ChatService/FindMessage"
 )
 
 // ChatServiceClient is the client API for ChatService service.
@@ -41,6 +43,8 @@ type ChatServiceClient interface {
 	SendMessage(ctx context.Context, in *SendMessageRequest, opts ...grpc.CallOption) (*Message, error)
 	EditMessage(ctx context.Context, in *EditMessageRequest, opts ...grpc.CallOption) (*Message, error)
 	DeleteMessage(ctx context.Context, in *DeleteMessageRequest, opts ...grpc.CallOption) (*Message, error)
+	FindAllMessage(ctx context.Context, in *FindAllMessageRequest, opts ...grpc.CallOption) (*Messages, error)
+	FindMessage(ctx context.Context, in *FindMessageRequest, opts ...grpc.CallOption) (*Message, error)
 }
 
 type chatServiceClient struct {
@@ -131,6 +135,26 @@ func (c *chatServiceClient) DeleteMessage(ctx context.Context, in *DeleteMessage
 	return out, nil
 }
 
+func (c *chatServiceClient) FindAllMessage(ctx context.Context, in *FindAllMessageRequest, opts ...grpc.CallOption) (*Messages, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(Messages)
+	err := c.cc.Invoke(ctx, ChatService_FindAllMessage_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *chatServiceClient) FindMessage(ctx context.Context, in *FindMessageRequest, opts ...grpc.CallOption) (*Message, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(Message)
+	err := c.cc.Invoke(ctx, ChatService_FindMessage_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ChatServiceServer is the server API for ChatService service.
 // All implementations must embed UnimplementedChatServiceServer
 // for forward compatibility
@@ -143,6 +167,8 @@ type ChatServiceServer interface {
 	SendMessage(context.Context, *SendMessageRequest) (*Message, error)
 	EditMessage(context.Context, *EditMessageRequest) (*Message, error)
 	DeleteMessage(context.Context, *DeleteMessageRequest) (*Message, error)
+	FindAllMessage(context.Context, *FindAllMessageRequest) (*Messages, error)
+	FindMessage(context.Context, *FindMessageRequest) (*Message, error)
 	mustEmbedUnimplementedChatServiceServer()
 }
 
@@ -173,6 +199,12 @@ func (UnimplementedChatServiceServer) EditMessage(context.Context, *EditMessageR
 }
 func (UnimplementedChatServiceServer) DeleteMessage(context.Context, *DeleteMessageRequest) (*Message, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteMessage not implemented")
+}
+func (UnimplementedChatServiceServer) FindAllMessage(context.Context, *FindAllMessageRequest) (*Messages, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method FindAllMessage not implemented")
+}
+func (UnimplementedChatServiceServer) FindMessage(context.Context, *FindMessageRequest) (*Message, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method FindMessage not implemented")
 }
 func (UnimplementedChatServiceServer) mustEmbedUnimplementedChatServiceServer() {}
 
@@ -331,6 +363,42 @@ func _ChatService_DeleteMessage_Handler(srv interface{}, ctx context.Context, de
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ChatService_FindAllMessage_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(FindAllMessageRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ChatServiceServer).FindAllMessage(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ChatService_FindAllMessage_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ChatServiceServer).FindAllMessage(ctx, req.(*FindAllMessageRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ChatService_FindMessage_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(FindMessageRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ChatServiceServer).FindMessage(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ChatService_FindMessage_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ChatServiceServer).FindMessage(ctx, req.(*FindMessageRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // ChatService_ServiceDesc is the grpc.ServiceDesc for ChatService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -369,6 +437,14 @@ var ChatService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "DeleteMessage",
 			Handler:    _ChatService_DeleteMessage_Handler,
+		},
+		{
+			MethodName: "FindAllMessage",
+			Handler:    _ChatService_FindAllMessage_Handler,
+		},
+		{
+			MethodName: "FindMessage",
+			Handler:    _ChatService_FindMessage_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

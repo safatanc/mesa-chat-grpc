@@ -15,6 +15,8 @@ service ChatService {
   rpc SendMessage(SendMessageRequest) returns (Message) {}
   rpc EditMessage(EditMessageRequest) returns (Message) {}
   rpc DeleteMessage(DeleteMessageRequest) returns (Message) {}
+  rpc FindAllMessage(FindAllMessageRequest) returns (Messages) {}
+  rpc FindMessage(FindMessageRequest) returns (Message) {}
 }
 
 // Space
@@ -58,11 +60,16 @@ message FindSpaceRequest {
 message Message {
   string id = 1;
   string space_id = 2;
-  string author_id = 3;
-  Space space = 4;
-  string content = 5;
-  int64 created_at = 6;
-  int64 updated_at = 7;
+  Space space = 3;
+  string author_id = 4;
+  user_pb.UserResponse author = 5;
+  string content = 6;
+  int64 created_at = 7;
+  int64 updated_at = 8;
+}
+
+message Messages {
+  repeated Message messages = 1;
 }
 
 message SendMessageRequest {
@@ -72,11 +79,17 @@ message SendMessageRequest {
 }
 
 message EditMessageRequest {
-  string space_id = 1;
-  string author_id = 2;
-  string content = 3;
+  string content = 1;
 }
 
 message DeleteMessageRequest {
+  string id = 1;
+}
+
+message FindAllMessageRequest {
+  string space_id = 1;
+}
+
+message FindMessageRequest {
   string id = 1;
 }
